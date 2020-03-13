@@ -1,0 +1,47 @@
+const int sampleWindow = 50; // Sample window width in milliseconds
+unsigned int sample;
+ 
+void setup() 
+{
+   Serial.begin(9600); // Opens serial port for the M Max patch
+}
+ 
+ 
+void loop() 
+{
+   unsigned long startMillis= millis();  // Start of sample window
+   unsigned int peakToPeak = 0;   // peak-to-peak level
+ 
+   unsigned int signalMax = 0;
+   unsigned int signalMin = 1024;
+ 
+   // collect data for 50 mS
+   while (millis() - startMillis < sampleWindow)
+   {
+      sample = analogRead(4);
+      if (sample < 1024)  // removes false readings
+      {
+         if (sample > signalMax)
+         {
+            signalMax = sample;  // saves the max levels
+         }
+         else if (sample < signalMin)
+         {
+            signalMin = sample;  // saves the min levels
+         }
+      }
+   }
+   peakToPeak = signalMax - signalMin;  // max - min = peak-peak amplitude
+   double voltage = (peakToPeak * 5.0) / 1024;  // converts to voltage
+ 
+   Serial.println(voltage); // sends to serial port for the Max patch
+  
+    if (gain > 0.4) //Activates Tens unit if past the voltage threshold
+    {
+      digitalWrite(3, HIGH);   
+   }
+   else
+   {
+      digitalWrite(3, LOW);   
+   }
+}
